@@ -1,0 +1,29 @@
+{
+  "name": "nervesparks",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Assignment for nervesparks",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abdul-nishar/NerveSparks.git"
+  },
+  "author": "Sheikh Abdul Nishar",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/abdul-nishar/NerveSparks/issues"
+  },
+  "homepage": "https://github.com/abdul-nishar/NerveSparks#readme",
+  "dependencies": {
+    "esm": "^3.2.25",
+    "express": "^4.19.2",
+    "mongodb": "^6.5.0"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^8.4.1",
+    "ndb": "^1.1.5"
+  }
+}
