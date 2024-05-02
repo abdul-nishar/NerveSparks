@@ -1,59 +1,19 @@
-import { readFileSync } from 'fs';
-import { fileURLToPath } from 'url';
-import path from 'path';
+import User from '../models/userModel.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import {
+  getAll,
+  getOne,
+  createOne,
+  deleteOne,
+  updateOne,
+} from './handlerFactory.js';
 
-const users = JSON.parse(
-  readFileSync(`${__dirname}/../dev-data/data/userData.json`)
-);
+export const getAllUsers = getAll('users');
 
-export const getAllUsers = (req, res) => {
-  res.status(200).json({
-    status: 'success',
-    results: users.length,
-    data: {
-      users: users,
-    },
-  });
-};
+export const createUser = createOne('users', User);
 
-export const createUser = (req, res) => {
-  res.status(400).json({
-    status: 'Error',
-    message: 'This route has not yet been implemented',
-  });
-};
+export const getUser = getOne('users');
 
-export const getUser = async (req, res) => {
-  const user = await users.find((el) => el.user_id === req.params.id);
+export const updateUser = updateOne('users');
 
-  if (!user) {
-    return res.status(404).json({
-      status: 'fail',
-      message: 'Invalid ID',
-    });
-  }
-
-  res.status(200).json({
-    status: 'success',
-    data: {
-      user: user,
-    },
-  });
-};
-
-export const updateUser = (req, res) => {
-  res.status(400).json({
-    status: 'Error',
-    message: 'This route has not yet been implemented',
-  });
-};
-
-export const deleteUser = (req, res) => {
-  res.status(400).json({
-    status: 'Error',
-    message: 'This route has not yet been implemented',
-  });
-};
+export const deleteUser = deleteOne('users');

@@ -1,11 +1,22 @@
-import catchAsync from '../utils/catchAsync';
-import AppError from '../utils/appError';
-import APIFeatures from '../utils/apiFeatures';
+import catchAsync from '../utils/catchAsync.js';
+import AppError from '../utils/appError.js';
+import APIFeatures from '../utils/apiFeatures.js';
+import { db } from '../server.js';
 
-export const deleteOne = (Model) =>
+export const deleteOne = (collection) =>
   catchAsync(async (req, res, next) => {
-    const doc = await Model.findByIdAndDelete(req.params.id);
-    if (!doc) return next(new AppError('No document found with this ID', 404));
+    let primaryId;
+
+    if (collection === 'cars') primaryId = 'car_id';
+    else if (collection === 'users') primaryId = 'user_id';
+
+    const result = await db
+      .collection(collection)
+      .deleteOne({ [primaryId]: req.params.id });
+
+    if (result.deletedCount === 0) {
+      return next(new Error('No document found with this ID')); // Assuming catchAsync handles errors
+    }
 
     res.status(204).json({
       status: 'success',
@@ -13,25 +24,36 @@ export const deleteOne = (Model) =>
     });
   });
 
-export const updateOne = (Model) =>
+export const updateOne = (collection) =>
   catchAsync(async (req, res, next) => {
-    const doc = await Model.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
-    if (!doc) return next(new AppError('No document found with this ID', 404));
+    let primaryId;
+
+    if (collection === 'cars') primaryId = 'car_id';
+    else if (collection === 'users') primaryId = 'user_id';
+
+    const result = await db.collection(collection).findOneAndUpdate(
+      { [primaryId]: req.params.id },
+      { $set: req.body },
+      {
+        returnOriginal: true,
+      }
+    );
+
+    if (!result.value) {
+      throw new Error('No document found with this ID');
+    }
 
     res.status(200).json({
       status: 'success',
       data: {
-        data: doc,
+        data: result,
       },
     });
   });
 
-export const createOne = (Model) =>
+export const createOne = (collection, Model) =>
   catchAsync(async (req, res, next) => {
-    const doc = await Model.create(req.body);
+    const doc = await db.collection(collection).insertOne(new Model(req.body));
     res.status(201).json({
       status: 'success',
       data: {
@@ -40,12 +62,20 @@ export const createOne = (Model) =>
     });
   });
 
-export const getOne = (Model, popOptions) =>
+export const getOne = (collection, popOptions) =>
   catchAsync(async (req, res, next) => {
-    let query = Model.findById(req.params.id);
-    if (popOptions) query = query.populate(popOptions);
+    let primaryId;
+
+    if (collection === 'cars') primaryId = 'car_id';
+    else if (collection === 'users') primaryId = 'user_id';
+
+    let query = db
+      .collection(collection)
+      .findOne({ [primaryId]: req.params.id });
 
     const doc = await query;
+
+    console.log(doc);
 
     if (!doc) return next(new AppError('No document found with this ID', 404));
 
@@ -57,20 +87,16 @@ export const getOne = (Model, popOptions) =>
     });
   });
 
-export const getAll = (Model) =>
+export const getAll = (collection) =>
   catchAsync(async (req, res, next) => {
-    let filter = {};
-    if (req.params.tourId) filter = { tour: req.params.tourId };
-
     // USING API FEATURES
-    const features = new APIFeatures(Model.find(filter), req.query)
-      .filter()
-      .sort()
-      .fieldSelection()
-      .paginate();
+    const features = await new APIFeatures(db, collection, req.query).filter();
+    // .sort()
+    // .fieldSelection()
+    // .paginate();
 
     // EXECUTE QUERY
-    const doc = await features.query;
+    const doc = await features.collection;
 
     // SEND RESPONSE
     res.status(200).json({
