@@ -1,13 +1,15 @@
 import { faker } from '@faker-js/faker';
+import { hashPassword } from '../utils/genericFns.js';
 
 class User {
-  constructor(user_email, user_location, user_info, password, vehicle_info) {
+  constructor(userData) {
     this.user_id = this.generateUserID();
-    this.user_email = user_email;
-    this.user_location = user_location;
-    this.user_info = user_info;
-    this.password = password;
-    this.vehicle_info = vehicle_info;
+    this.role = 'user';
+    this.user_email = userData.user_email;
+    this.user_location = userData.user_location;
+    this.user_info = userData.user_info;
+    this.password = hashPassword(userData.password);
+    this.vehicle_info = userData.vehicle_info;
   }
 
   generateUserID() {
