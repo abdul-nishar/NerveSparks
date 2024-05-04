@@ -1,12 +1,12 @@
 import { faker } from '@faker-js/faker';
 
 class Car {
-  constructor(car_type, car_name, car_model, car_info) {
+  constructor(carData) {
     this.car_id = this.generateCarId();
-    this.type = car_type;
-    this.name = car_name;
-    this.model = car_model;
-    this.car_info = car_info;
+    this.type = carData.type;
+    this.name = carData.name;
+    this.model = carData.model;
+    this.car_info = carData.car_info;
   }
 
   generateCarId() {

@@ -9,6 +9,7 @@ export const deleteOne = (collection) =>
 
     if (collection === 'cars') primaryId = 'car_id';
     else if (collection === 'users') primaryId = 'user_id';
+    else if (collection === 'dealerships') primaryId = 'dealership_id';
 
     const result = await db
       .collection(collection)
@@ -30,6 +31,28 @@ export const updateOne = (collection) =>
 
     if (collection === 'cars') primaryId = 'car_id';
     else if (collection === 'users') primaryId = 'user_id';
+    else if (collection === 'dealerships') primaryId = 'dealership_id';
+
+    // Updating nested properties without entirely replacing them
+    const updateFields = { ...req.body };
+    const nestedUpdateFields = {};
+
+    Object.entries(updateFields).forEach(([key, value]) => {
+      if (key.includes('.')) {
+        const [parentKey, nestedKey] = key.split('.');
+        if (!nestedUpdateFields[parentKey]) {
+          nestedUpdateFields[parentKey] = {};
+        }
+        nestedUpdateFields[parentKey][nestedKey] = value;
+        delete updateFields[key];
+      }
+    });
+
+    const updateQuery = { $set: updateFields };
+
+    Object.entries(nestedUpdateFields).forEach(([key, value]) => {
+      updateQuery[key] = { $set: value };
+    });
 
     const result = await db.collection(collection).findOneAndUpdate(
       { [primaryId]: req.params.id },
@@ -39,11 +62,11 @@ export const updateOne = (collection) =>
       }
     );
 
-    if (!result.value) {
+    if (!result) {
       throw new Error('No document found with this ID');
     }
 
-    res.status(200).json({
+    res.status(201).json({
       status: 'success',
       data: {
         data: result,
@@ -62,20 +85,18 @@ export const createOne = (collection, Model) =>
     });
   });
 
-export const getOne = (collection, popOptions) =>
+export const getOne = (collection) =>
   catchAsync(async (req, res, next) => {
     let primaryId;
-
     if (collection === 'cars') primaryId = 'car_id';
     else if (collection === 'users') primaryId = 'user_id';
+    else if (collection === 'dealerships') primaryId = 'dealership_id';
 
     let query = db
       .collection(collection)
       .findOne({ [primaryId]: req.params.id });
 
     const doc = await query;
-
-    console.log(doc);
 
     if (!doc) return next(new AppError('No document found with this ID', 404));
 
@@ -97,6 +118,12 @@ export const getAll = (collection) =>
 
     // EXECUTE QUERY
     const doc = await features.collection;
+
+    const carArray = [];
+
+    for (const car of doc) {
+      carArray.push(car.car_id);
+    }
 
     // SEND RESPONSE
     res.status(200).json({
