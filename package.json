@@ -11,14 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/abdul-nishar/NerveSparks.git"
+    "url": "git+https://github.com/abdul-nishar/VroomRent.git"
   },
   "author": "Sheikh Abdul Nishar",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/abdul-nishar/NerveSparks/issues"
+    "url": "https://github.com/abdul-nishar/VroomRent/issues"
   },
-  "homepage": "https://github.com/abdul-nishar/NerveSparks#readme",
+  "homepage": "https://github.com/abdul-nishar/VroomRent#readme",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "compression": "^1.7.4",
