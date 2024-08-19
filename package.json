@@ -1,8 +1,8 @@
 {
-  "name": "nervesparks",
+  "name": "VroomRent API",
   "type": "module",
   "version": "1.0.0",
-  "description": "Assignment for nervesparks",
+  "description": "API for rental cars",
   "main": "app.js",
   "scripts": {
     "start": "node server.js",
